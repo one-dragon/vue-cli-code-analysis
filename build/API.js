@@ -1,6 +1,6 @@
 const path = require('path')
-// const hash = require('hash-sum')
-const { semver, matchesPluginId } = require('@vue/cli-shared-utils')
+const hash = require('hash-sum')
+const { semver, matchesPluginId } = require('./util')
 
 class API {
     constructor(id, service) {
@@ -130,6 +130,9 @@ class API {
 
     /**
      * 根据多个变量生成缓存标识符
+     * id: 'babel-loader' 'eslint-loader' 'vue-loader' 'ts-loader'
+     * partialIdentifier: {}
+     * configFiles: []
     */
     genCacheConfig(id, partialIdentifier, configFiles = []) {
         const fs = require('fs')
@@ -137,7 +140,66 @@ class API {
         // cache-loader 一般设置缓存到 node_modules/.cache/ 下
         const cacheDirectory = this.resolve(`node_modules/.cache/${id}`)
 
-        // 将 \r \n 替换为 \n 生成一致的哈希
+        // 将 \r \n 替换为 \n 生成一致哈希
+        const fmtFunc = conf => {
+            if (typeof conf === 'function') {
+                return conf.toString().replace(/\r\n?/g, '\n')
+            }
+            return  conf
+        }
+
+        const variables = {
+            partialIdentifier,
+            'cli-service': require('../package.json').version,
+            'cache-loader': require('cache-loader/package.json').version,
+            env: process.env.NODE_ENV,
+            test: !!process.env.VUE_CLI_TEST,
+            config: [
+                // 获取用户配置的链式配置
+                fmtFunc(this.service.projectOptions.chainWebpack),
+                // 获取用户配置的原始的 webpack 配置
+                fmtFunc(this.service.projectOptions.configureWebpack)
+            ]
+        }
+
+        // configFiles: 传入一个配置文件列表，后面会尝试获取读取文件内容
+        if (!Array.isArray(configFiles)) {
+            configFiles = [configFiles]
+        }
+        configFiles = configFiles.concat([
+            'package-lock.json',
+            'yarn.lock',
+            'pnpm-lock.yaml'
+        ])
+
+        // 读取文件内容
+        const readConfig = file => {
+            const absolutePath = this.resolve(file)
+            if (!fs.existsSync(absolutePath)) { // 判断文件是否存在
+                return
+            }
+        
+            if (absolutePath.endsWith('.js')) {
+                // js 文件时，通过 require 获取内容
+                // 应该评估配置脚本以反映环境变量的变化
+                try {
+                    return JSON.stringify(require(absolutePath))
+                } catch (e) {
+                    return fs.readFileSync(absolutePath, 'utf-8')
+                }
+            } else {
+                return fs.readFileSync(absolutePath, 'utf-8')
+            }
+        }
+
+        // 读取配置文件内容并返回内容列表
+        variables.configFiles = configFiles.map(file => {
+            const content = readConfig(file)
+            return content && content.replace(/\r\n?/g, '\n')
+        })
+
+        const cacheIdentifier = hash(variables) // 生成 hash 值
+        return { cacheDirectory, cacheIdentifier }
     }
 }
 

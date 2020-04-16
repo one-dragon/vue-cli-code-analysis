@@ -1,4 +1,4 @@
-const { chalk } = require('@vue/cli-shared-utils')
+const { chalk } = require('../util')
 const getPadLength = require('../util/getPadLength')
 
 module.exports = (api, options) => {
