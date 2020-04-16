@@ -8,4 +8,5 @@
     Object.assign(exports, require(`./${m}`))
 })
 
-exports.chalk = require('chalk')
+exports.chalk = require('chalk') // 定义输出样式文本
+exports.semver = require('semver') // npm 的语义版本控制工具

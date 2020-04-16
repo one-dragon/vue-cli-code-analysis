@@ -14,19 +14,19 @@ const { defaultsOptions } = require('./options')
 module.exports = class Service {
     constructor(context, { plugins, pkg, inlineOptions, useBuiltIn } = {}) {
         process.VUE_CLI_SERVICE = this
-        
+
         this.initialized = false // 是否已初始化
-        
+
         // 当前执行 node 命令所在的文件夹地址，
         // 一般在项目根目录下
         this.context = context
-        
+
         this.inlineOptions = inlineOptions // 初始化传入 '内联配置'
 
         this.webpackChainFns = [] // 链式配置函数列表 [ fn, ... ]
         this.webpackRawConfigFns = [] // 原始的 webpack 配置列表 [ fn, obj, ... ]
         this.devServerConfigFns = []
-        
+
         this.commands = {} // 运行命令集合，{ serve: { fn, opts}, ... }
 
         // 包含目标插件的 package.json 的文件夹地址，
@@ -45,11 +45,11 @@ module.exports = class Service {
         // console.log(this.plugins)
 
         /*  获取不同的环境模式，如：
-            { 
+            {
                 serve: 'development',
                 build: 'production',
                 inspect: 'development',
-                'test:unit': 'test' 
+                'test:unit': 'test'
             }
         */
         this.modes = this.plugins.reduce((modes, { apply: { defaultModes }}) => {
@@ -132,7 +132,7 @@ module.exports = class Service {
                 dotenvExpand(env)
                 // logger(envPath, env)
             } catch (err) {
-                // ENOENT 错误表示找不到文件或目录，遇到错误时忽略报错
+                // ENOENT 错误表示找不到文件或目录，遇到此错误时忽略报错
                 // only ignore error if file is not found
                 if (err.toString().indexOf('ENOENT') < 0) {
                     error(err)
@@ -174,7 +174,7 @@ module.exports = class Service {
         const pluginsToSkip = skipPlugins
             ? new Set(skipPlugins.split(',').map(id => resolvePluginId(id)))
             : new Set()
-    
+
         this.pluginsToSkip = pluginsToSkip
     }
 
@@ -185,9 +185,9 @@ module.exports = class Service {
             id: id.replace(/^.\//, 'built-in:'),
             apply: require(id)
         })
-        
+
         let plugins
-        
+
         const builtInPlugins = [
             './commands/serve',
             // './commands/build',
@@ -249,8 +249,8 @@ module.exports = class Service {
 
     /**
      * 初始化并运行对应环境命令
-     * @param {*} name 
-     * @param {*} args 
+     * @param {*} name
+     * @param {*} args
      * {
             _: [ 'serve' ],
             modern: false,
@@ -261,9 +261,9 @@ module.exports = class Service {
             open: true,
             copy: false,
             https: false,
-            verbose: false 
+            verbose: false
         }
-     * @param {*} rawArgv 
+     * @param {*} rawArgv
      */
     async run(name, args = {}, rawArgv = []) {
         // console.log('name:', name)
@@ -314,7 +314,7 @@ module.exports = class Service {
         if (!this.initialized) { // 初始化时为 false，init 后为 true
             throw new Error('Service must call init() before calling resolveWebpackConfig().')
         }
-        
+
         // 获取原始配置
         let config = chainableConfig.toConfig()
         const original = config
@@ -369,7 +369,7 @@ module.exports = class Service {
                     return allEntries.concat(curr)
                 }, [])
             }
-      
+
             entryFiles = entryFiles.map(file => path.resolve(this.context, file))
             process.env.VUE_CLI_ENTRY_FILES = JSON.stringify(entryFiles)
         }

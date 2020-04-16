@@ -22,7 +22,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "node ./build/bin/index.js serve --open=111 ./src/app/index.html",
+    "serve": "node ./build/bin/index.js serve --open ./src/app/index.html",
     "test1": "node ./build/util/logger"
   },
   "author": "",
