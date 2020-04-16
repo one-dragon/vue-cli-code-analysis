@@ -1,0 +1,30 @@
+{
+  "name": "webpack-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "address": "^1.1.2",
+    "chalk": "^3.0.0",
+    "default-gateway": "^6.0.0",
+    "dotenv": "^8.2.0",
+    "dotenv-expand": "^5.1.0",
+    "lodash.defaultsdeep": "^4.6.1",
+    "minimist": "^1.2.5",
+    "portfinder": "^1.0.25",
+    "read-pkg": "^5.2.0",
+    "strip-ansi": "^6.0.0",
+    "webpack": "^4.42.0",
+    "webpack-chain": "^6.4.0",
+    "webpack-dev-server": "^3.10.3",
+    "webpack-merge": "^4.2.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "node ./build/bin/index.js serve --open=111 ./src/app/index.html",
+    "test1": "node ./build/util/logger"
+  },
+  "author": "",
+  "license": "ISC"
+}
