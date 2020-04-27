@@ -32,7 +32,7 @@ module.exports = class Service {
         // 包含目标插件的 package.json 的文件夹地址，
         // 默认为 this.context 项目根目录下
         this.pkgContext = context
-        // 包含插件的 package.json
+        // 包含插件的 package.json，解析本地自定义插件内容
         this.pkg = this.resolvePkg(pkg)
 
         // 如果有内联插件，则将使用它们，而不是 package.json 中的插件。
