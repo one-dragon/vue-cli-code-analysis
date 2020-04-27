@@ -21,8 +21,8 @@ module.exports = (api, options) => {
             /**
              * https://github.com/arcanis/pnp-webpack-plugin
              * 
-             * resolve选项将负责正确解析程序所需的依赖项，
-             * resolveLoader选项将帮助 Webpack 查找磁盘上加载程序的位置。
+             * resolve 选项将负责正确解析程序所需的依赖项，
+             * resolveLoader 选项将帮助 Webpack 查找磁盘上加载程序的位置。
              * 在这种情况下，所有加载程序都将相对于包含您的配置的包进行解析。
              * 
              * 如果部分配置来自使用自己加载程序的第三方包，请确保它们使用 require.resolve
