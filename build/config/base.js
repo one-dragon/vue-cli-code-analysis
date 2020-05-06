@@ -7,7 +7,7 @@ module.exports = (api, options) => {
         const isLegacyBundle = process.env.VUE_CLI_MODERN_MODE && !process.env.VUE_CLI_MODERN_BUILD
         // 返回当前工程根下的文件夹地址
         const resolveLocal = require('../util/resolveLocal')
-        // 返回静态资源的文件夹地址
+        // 返回静态资源的文件地址
         const getAssetPath = require('../util/getAssetPath')
         // 设置内联文件生成 Data URL 的字节限制
         const inlineLimit = 4096
@@ -48,14 +48,14 @@ module.exports = (api, options) => {
                 .path(api.resolve(options.outputDir)) // 默认打包后生成 dist 文件夹
                 .filename(isLegacyBundle ? '[name]-legacy.js' : '[name].js')
                 .publicPath(options.publicPath)
-            
+
         /**
          * https://github.com/arcanis/pnp-webpack-plugin
-         * 
+         *
          * resolve 选项将负责正确解析程序所需的依赖项，
          * resolveLoader 选项将帮助 Webpack 查找磁盘上加载程序的位置。
          * 在这种情况下，所有加载程序都将相对于包含您的配置的包进行解析。
-         * 
+         *
          * 如果部分配置来自使用自己加载程序的第三方包，请确保它们使用 require.resolve
          * - 这将确保解析过程是可移植的跨环境（包括 Plug'n'Play 未启用），并防止它依赖于未定义的行为
          */
@@ -89,7 +89,7 @@ module.exports = (api, options) => {
                 .add('node_modules')
                 .add(api.resolve('node_modules'))
                 .add(resolveLocal('node_modules'))
-            
+
         webpackConfig.module
             // 过滤不需要解析的文件（文件中不会引用其他的包），提高打包效率
             .noParse(/^(vue|vue-router|vuex|vuex-router-sync)$/)
@@ -101,7 +101,7 @@ module.exports = (api, options) => {
         const vueLoaderCacheIdentifier = {
             'vue-loader': require('vue-loader/package.json').version
         }
-        // Vue 2 项目中肯定存在以下 2 个 deps。 
+        // Vue 2 项目中肯定存在以下 2 个 deps。
         // 但是一旦我们切换到 Vue 3，它们就不再是必需的。
         // 在 Vue 3 中，它们应该被 @vue/compiler-sfc 替换，
         // 所以把它们包在一个 try catch 块中。
@@ -130,21 +130,21 @@ module.exports = (api, options) => {
                             whitespace: 'condense'
                         }
                     }, vueLoaderCacheConfig))
-        
+
         // https://github.com/Yatoo2018/webpack-chain/tree/zh-cmn-Hans#%E9%85%8D%E7%BD%AE%E6%8F%92%E4%BB%B6
         webpackConfig
             .plugin('vue-loader')
             .use(require('vue-loader/lib/plugin'))
-        
+
         // static assets 静态资源配置-----------------------------------------------------------
-        
+
         webpackConfig.module
             .rule('images')
                 .test(/\.(png|jpe?g|gif|webp)(\?.*)?$/)
                 .use('url-loader')
                     .loader(require.resolve('url-loader'))
                     .options(genUrlLoaderOptions('img'))
-        
+
         // 不要使用 base64-inline SVGs
         // https://github.com/facebookincubator/create-react-app/pull/1180
         webpackConfig.module
@@ -155,23 +155,23 @@ module.exports = (api, options) => {
                     .options({
                         name: genAssetSubPath('img')
                     })
-        
+
         webpackConfig.module
             .rule('media')
                 .test(/\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/)
                 .use('url-loader')
                     .loader(require.resolve('url-loader'))
                     .options(genUrlLoaderOptions('media'))
-        
+
         webpackConfig.module
             .rule('fonts')
                 .test(/\.(woff2?|eot|ttf|otf)(\?.*)?$/i)
                 .use('url-loader')
                     .loader(require.resolve('url-loader'))
                     .options(genUrlLoaderOptions('fonts'))
-        
+
         // Other common pre-processors 其他常用预处理器设置---------------------------------------------
-                 
+
         const maybeResolve = name => {
             try {
                 return require.resolve(name)
@@ -207,10 +207,10 @@ module.exports = (api, options) => {
         /**
          * 这些选项可以配置是否 polyfill 或 mock 某些 Node.js 全局变量和模块。
          * 这可以使最初为 Node.js 环境编写的代码，在其他环境（如浏览器）中运行
-         * 
+         *
          * 此功能由 webpack 内部的 NodeStuffPlugin 插件提供。
          * 如果 target 是 "web"（默认）或 "webworker"，那么 NodeSourcePlugin 插件也会被激活。
-         * 
+         *
          * 从 webpack 3.0.0 开始，node 选项可能被设置为 false，
          * 以完全关闭 NodeStuffPlugin 和 NodeSourcePlugin 插件。
          */
@@ -230,7 +230,7 @@ module.exports = (api, options) => {
                 tls: 'empty',
                 child_process: 'empty'
             })
-        
+
         // 加载本地设置的 .env 文件的全局变量到 DefinePlugin 中
         // 全局环境变量设置到 DefinePlugin 中
         // options.publicPath 设置到 DefinePlugin 中（BASE_URL）
@@ -249,7 +249,7 @@ module.exports = (api, options) => {
         webpackConfig
             .plugin('case-sensitive-paths')
                 .use(require('case-sensitive-paths-webpack-plugin'))
-        
+
         // 当 webpack 解析一个 loader 失败时，
         // friendly-errors-webpack-plugin 会显示非常混乱的错误提示信息
         // 因此需提供自定义处理程序来改进它
@@ -263,7 +263,7 @@ module.exports = (api, options) => {
                         additionalFormatters: [formatter]
                     }
                 ])
-        
+
         // 用 terser-webpack-plugin 替换掉 uglifyjs-webpack-plugin 解决 uglifyjs 不支持 es6 语法问题
         // 支持 ES6 的语法压缩，因为可设置现代模式进行打包
         const TerserPlugin = require('terser-webpack-plugin')
